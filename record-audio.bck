@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+output="${1:-recording-$(date +%Y-%m-%d_%H-%M-%S).wav}"
+
+exec pacat -v --record \
+  --file-format=wav \
+  --format=s16le \
+  --rate=48000 \
+  --channels=2 \
+  "$output"

@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+source='@DEFAULT_MONITOR@'
+output="recording-$(date +%Y-%m-%d_%H-%M-%S).wav"
+
+usage() {
+  echo "Usage: $0 [--device SOURCE] [OUTPUT.wav]" >&2
+  echo "Example: $0 --device alsa_output.example.analog-stereo.monitor earpiece.wav" >&2
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -d|--device)
+      [ "$#" -ge 2 ] || { usage; exit 2; }
+      source=$2
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 2
+      ;;
+    *)
+      output=$1
+      shift
+      ;;
+  esac
+done
+
+exec pacat -v --record \
+  --device="$source" \
+  --file-format=wav \
+  --format=s16le \
+  --rate=48000 \
+  --channels=2 \
+  "$output"
